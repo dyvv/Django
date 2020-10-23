@@ -1,0 +1,112 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+
+<h4>Listing: {{listing.title}} </h4>
+
+{% if current_user_is_winner %}
+  <b><span style="background-color: red; font-size: 30px; ">Congradulation!! You won! Your bid $ {{max_bid}} is max!</span></b>
+{% endif %}
+
+<div>
+    {% if not is_listing_in_watchlist and user.is_authenticated %}
+
+<a href="{% url 'add_wl' listing.id %}"> <span style="background-color: #DDFF33; font-size: 15px; ">Add WatchList </span></a>
+
+    {% endif %}
+
+
+    {% if is_listing_in_watchlist and user.is_authenticated%}
+
+<a href="{% url 'remove_wl' listing.id %}"> <span style="background-color: #FF7D33; font-size: 15px; "> Remove WatchList </span> </a>
+
+    {% endif %}
+
+    {% if is_owner == True  and listing.is_active %}
+
+
+     <b><a href="{% url 'close_listing' listing.id %}"><span style="background-color: #4633FF; color: white; font-size: 15px;  ">   Close listing </span></a></b>
+
+
+    {% endif %}
+
+</div>
+
+<div><img src="{{listing.picture_url}}"/></div>
+<div class="description"> Description: {{listing.description}}</div>
+<div> <b> ${{max_bid}} </b></div>
+
+{% if user.is_authenticated %}
+<div> {{bids_count}} bid so far. Your bid is the current bid</div>
+{% endif %}
+
+
+{% if is_not_enough == True %}
+  <h6><span style = "background-color: red">You bid should be more than {{max_bid}}</span></h6>
+{% endif %}
+
+{% if listing.is_active and not bid_already_placed and user.is_authenticated %}
+
+<form method="post">
+  {% csrf_token %}
+
+  {{bid_form}}
+
+
+
+<input class="btn btn-primary" type="submit" value="Submit Bid">
+
+</form>
+
+{% endif %}
+
+
+
+<div> Details:
+ <ul>
+  <li>Created by: {{listing.createdby}}</li>
+  <li>Category: {{listing.category}}</li>
+ </ul>
+</div>
+
+
+
+
+
+
+  {% if listing.winner == current_user %}
+
+  <b>Congradulations! You are winner!!</b>
+
+  {% endif %}
+
+
+{% if user.is_authenticated %}
+  <div>
+    ===================================================
+   <form  method = "post">
+      {% csrf_token %}
+      {{comment_form}}
+      <input type="submit" value="Submit Comment">
+    </form>
+
+    ==================================================
+  </div>
+{% endif %}
+
+
+
+  <b>Comments:</b>
+  <ol>
+  {% for comment in comments %}
+
+
+  <li>{{comment}} (Posted by : {{comment.createdby}})</li>
+
+  {% endfor %}
+  </ol>
+
+
+
+{% endblock %}
